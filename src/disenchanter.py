@@ -42,6 +42,10 @@ def get_secrets():
     else:
         _LOCKFILE = _LOCKFILE_LOC + _LOCKFILE_NAME
 
+    if not os.path.isfile(_LOCKFILE):
+        print(f'Lockfile does not exist at {_LOCKFILE}. Start League client or run this script from the same dir as the lockfile')
+        exit(1)
+
     with open(_LOCKFILE) as _fh:
         file = _fh.readline()
 
