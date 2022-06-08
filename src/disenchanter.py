@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# place into your lol install dir
-
 import json
 import os
 import argparse
@@ -25,6 +23,9 @@ _CHEST = 'CHEST'
 _DISENCHANT = 'CHAMPION_RENTAL_disenchant'
 _OPEN = '_OPEN'  #chest recipe name is <lootID>_OPEN
 _CRAFT = 'craft'
+
+#Query
+_REPEAT = 'repeat='
 
 def parser_setup():
     parser = argparse.ArgumentParser(description='Do stuff with lol loot inventory')
@@ -111,14 +112,22 @@ def use_recipe(session, address, lootId, count, check = False):
     else:
         recipe = _DISENCHANT
     
-    url = '/'.join([address, _CRAFT_ENDPOINT, recipe, _CRAFT])
+    if count > 1:
+        craft = _CRAFT + '?' + _REPEAT + str(count)
+    else:
+        craft = _CRAFT
+    
+    url = '/'.join([address, _CRAFT_ENDPOINT, recipe, craft])
 
     if check:
         print (url + '   -   ' + lootId + '    -   ' + str(count))
         return
 
-    for x in range(count):
-        session.post(url, headers=header, data=payload)
+    response = session.post(url, headers=header, data=payload)
+
+    if not response.status_code == 200:
+        print(f'Request to {url} failed')
+        exit(1)
 
 if __name__ == "__main__":
     parser = parser_setup()
